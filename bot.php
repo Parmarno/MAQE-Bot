@@ -1,14 +1,21 @@
 <?php 
+/**
+* MAQE-Bot
+* Description : MAQE Homework Challenge - MAQE Bot
+* Author : Ekkarach Kulwong
+* Email : k.ekkarach@gmail.com
+*/
+
     if( !class_exists('botClass') ) :
         class botClass {
             private $axis_x, $axis_y, $running ,$walk, $count_walk, $direction, $status;
+            public $command, $debug = false;
 
-            public function __construct( $command ){
-                $this->command = strtoupper($command);
-                $this->init();
+            public function __construct(){
+                
             }
 
-            private function init(){
+            public function init(){
                 
                 $this->reset();
                 $this->validate();
@@ -18,6 +25,8 @@
             }
 
             private function reset(){
+
+                $this->command = strtoupper($this->command);
                 $this->walk = 0;
                 $this->axis_x = 0;
                 $this->axis_y = 0;    
@@ -27,40 +36,43 @@
                 $this->status = 1;
                 $this->exit = false;
                 $this->validate = false;
-                $this->debug = false;
             }
 
             private function validate(){
 
-                if( !( preg_match("/^[LRW0-9]+$/", $this->command) == 1 ) ) :
-                    if( $this->debug ) :
-                        echo "Invalid character.\n"; 
-                    endif;
-                else:
-                    if( preg_match_all('/W+/', $this->command, $matches_walk) ) :
-                        if( preg_match_all('/\d+/', $this->command, $matches_count_walk) ) :
-                            $this->count_walk = $matches_count_walk[0];
-                            if( count($matches_walk[0]) == count($this->count_walk)  ) :
-                                $this->validate = true;
+                if( $this->command != '' ) :
+                    if( !( preg_match("/^[LRW0-9]+$/", $this->command) == 1 ) ) :
+                        if( $this->debug ) :
+                            echo "Invalid character.\n"; 
+                        endif;
+                    else:
+                        if( preg_match_all('/W+/', $this->command, $matches_walk) ) :
+                            if( preg_match_all('/\d+/', $this->command, $matches_count_walk) ) :
+                                $this->count_walk = $matches_count_walk[0];
+                                if( count($matches_walk[0]) == count($this->count_walk)  ) :
+                                    $this->validate = true;
+                                else :
+                                    if( $this->debug ) :
+                                        echo "Error type walk but specify number step.\n";
+                                    endif;
+                                    
+                                endif;
                             else :
                                 if( $this->debug ) :
                                     echo "Error type walk but specify number step.\n";
                                 endif;
-                                
+                            endif;
+                        elseif( preg_match_all('/\d+/', $this->command) ):
+                            if( $this->debug ) :
+                                echo "Error type number step but specify walk.\n";
                             endif;
                         else :
-                            if( $this->debug ) :
-                                echo "Error type walk but specify number step.\n";
-                            endif;
+                            $this->validate = true;
                         endif;
-                    elseif( preg_match_all('/\d+/', $this->command) ):
-                        if( $this->debug ) :
-                            echo "Error type number step but specify walk.\n";
-                        endif;
-                    else :
-                        $this->validate = true;
-                    endif;
-                endif; 
+                    endif; 
+                else :
+                    $this->validate = true;
+                endif;
             }
 
             private function process(){
@@ -173,7 +185,6 @@
                         $this->exit = true;
                         exit(0);
                     endif;
-                    
                     $this->command = strtoupper($command);
                     $this->init();
                 } while(!$this->exit);
@@ -181,8 +192,11 @@
         }
     endif; 
     
-    
-    $objBot = new botClass(isset($argv[1]) ? $argv[1] : '');
+    $objBot = new botClass();
+    $objBot->command = isset($argv[1]) ? $argv[1] : '';
+    $objBot->debug = (!getopt("d", [], null)) ? true : false;
+    $objBot->init();
+
     
 
-?>
+    
