@@ -27,7 +27,7 @@
                 $this->status = 1;
                 $this->exit = false;
                 $this->validate = false;
-                $this->debug = true;
+                $this->debug = false;
             }
 
             private function validate(){
@@ -55,7 +55,7 @@
                         endif;
                     elseif( preg_match_all('/\d+/', $this->command) ):
                         if( $this->debug ) :
-                            echo "ณือฟสรก .\n"; 
+                            echo "Error type number step but specify walk.\n";
                         endif;
                     else :
                         $this->validate = true;
